@@ -21,12 +21,12 @@ const grid = document.getElementById('grid');
 const template = document.getElementById('gift-template').content;
 const sortBtn = document.getElementById('sortBtn');
 const filterBtn = document.getElementById('filterBtn');
-  sortBtn.disabled = true;
-  filterBtn.disabled = true;
-    sortBtn.style.display = 'none';
-    filterBtn.style.display = 'none';
+// REMOVED: sortBtn.disabled = true;
+// REMOVED: filterBtn.disabled = true;
+// REMOVED: sortBtn.style.display = 'none';
+// REMOVED: filterBtn.style.display = 'none';
 const toggleBought = document.getElementById('toggleBought');
-  toggleBought.style.display = 'none';
+// REMOVED: toggleBought.style.display = 'none';
 
 const modal = document.getElementById('modal');
 const modalClose = document.getElementById('modalClose');
@@ -56,6 +56,7 @@ const createStars = count=>{
   }
   return frag;
 };
+const isTouchDevice = ()=> matchMedia('(pointer: coarse)').matches; // Helper to check for touch device
 
 /* render one card */
 function renderCard(g){
@@ -89,33 +90,30 @@ function renderCard(g){
   viewLink.addEventListener('click', e=> e.stopPropagation());
   markBtn.addEventListener('click', e=>{ e.stopPropagation(); g.bought = !g.bought; article.classList.toggle('bought', g.bought); });
 
-  // hover shows overlay; on touch, toggle class instead of hover
+  // Mobile/Desktop Click/Tap: Always open modal
   article.addEventListener('click', (e)=>{
-    const isTouch = matchMedia('(pointer: coarse)').matches;
-    if(isTouch){
-      // toggle info on first tap; second tap opens modal
-      if(!article.classList.contains('show-info')){ article.classList.add('show-info'); return; }
-      openModal(g);
-    } else {
-      openModal(g);
-    }
+    // The previous complex touch logic is removed. Now, any tap/click opens the modal.
+    // The hover-based overlay is handled by CSS (desktop only)
+    openModal(g);
   });
 
   article.addEventListener('keydown', e=>{ if(e.key==='Enter' || e.key===' ') { e.preventDefault(); openModal(g); } });
 
-  // parallax effect for pointer devices
+  // Parallax effect: Only for fine pointer devices (desktop/mouse)
   let raf;
-  article.addEventListener('pointermove', ev=>{
-    if(ev.pointerType === 'touch') return;
-    cancelAnimationFrame(raf);
-    raf = requestAnimationFrame(()=>{
-      const r = article.getBoundingClientRect();
-      const px = (ev.clientX - r.left)/r.width - 0.5;
-      const py = (ev.clientY - r.top)/r.height - 0.5;
-      img.style.transform = `translate(${px*8}px, ${py*6}px) scale(1.03)`;
-    });
-  });
-  article.addEventListener('pointerleave', ()=> img.style.transform = '');
+  if (!isTouchDevice()) {
+      article.addEventListener('pointermove', ev=>{
+        cancelAnimationFrame(raf);
+        raf = requestAnimationFrame(()=>{
+          const r = article.getBoundingClientRect();
+          const px = (ev.clientX - r.left)/r.width - 0.5;
+          const py = (ev.clientY - r.top)/r.height - 0.5;
+          img.style.transform = `translate(${px*8}px, ${py*6}px) scale(1.03)`;
+        });
+      });
+      article.addEventListener('pointerleave', ()=> img.style.transform = '');
+  }
+
 
   // fallback for broken images
   img.addEventListener('error', ()=> img.src = 'placeholder.png');
@@ -146,7 +144,7 @@ function openModal(g){
   clearChildren(modalUtility); modalUtility.appendChild(createStars(clamp(g.utility,1,5)));
   modalPrice.textContent = g.price; modalStore.textContent = g.store; modalLink.href = g.link;
   markBoughtBtn.textContent = g.bought ? 'Desmarcar comprado' : 'Marcar como comprado';
-  markBoughtBtn.onclick = ()=>{ g.bought = !g.bought; markBoughtBtn.textContent = g.bought ? 'Desmarcar comprado' : 'Marcar como comprado'; renderAll(currentList); };
+  markBoughtBtn.onclick = ()=>{ g.bought = !g.bought; markBoughtBtn.textContent = g.bought ? 'Desmarcar comprado' : 'Marcar como comprado'; renderAll(currentList); closeModal(); }; // Added closeModal() after action
 
   modal.setAttribute('aria-hidden','false'); document.body.style.overflow = 'hidden';
   setTimeout(()=> modalClose.focus(), 50);
@@ -159,8 +157,8 @@ sortBtn.addEventListener('click', ()=>{
   renderAll(currentList);
 });
 filterBtn.addEventListener('click', ()=>{
-  if(currentList._filtered){ currentList = [...gifts]; currentList._filtered = false; }
-  else { currentList = gifts.filter(i => i.interest >=4 || i.utility >=4); currentList._filtered = true; }
+  if(currentList._filtered){ currentList = [...gifts]; currentList._filtered = false; filterBtn.textContent = 'Filtrar top'; }
+  else { currentList = gifts.filter(i => i.interest >=4 || i.utility >=4); currentList._filtered = true; filterBtn.textContent = 'Mostrar todos'; }
   renderAll(currentList);
 });
 toggleBought.addEventListener('click', ()=>{
@@ -172,7 +170,7 @@ toggleBought.addEventListener('click', ()=>{
 /* modal handlers */
 modalClose.addEventListener('click', closeModal);
 modal.addEventListener('click', e => { if(e.target === modal) closeModal(); });
-document.addEventListener('keydown', e => { if(e.key === 'Escape') closeModal(); });
+document.addEventListener('keydown', e => { if(e.key === 'Escape' && modal.getAttribute('aria-hidden') === 'false') closeModal(); }); // Check if modal is open
 
 /* re-render on resize to avoid layout glitches */
 let resizeTimer;

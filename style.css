@@ -37,12 +37,16 @@ body{
   display:flex;align-items:center;justify-content:center;box-shadow:0 8px 26px rgba(175,30,89,0.12);
 }
 .profile-photo{width:100%;height:100%;object-fit:cover;border-radius:50%;border:6px solid var(--c8);transition:transform 420ms var(--transition);}
-.profile-photo-wrap:hover .profile-photo{transform:scale(1.03) rotate(-2deg)}
+/* Only apply hover effect for non-touch devices (desktop) */
+@media (pointer: fine) {
+  .profile-photo-wrap:hover .profile-photo{transform:scale(1.03) rotate(-2deg)}
+}
+
 .profile-card{flex:1;min-width:0}
 .name{margin:0;font-size:1.35rem;color:var(--c1)}
 .subtitle{margin:6px 0 10px;color:#6b2b3a;font-weight:600}
 .bio{margin:0 0 12px;color:#4b3b44;line-height:1.45}
-.profile-actions{display:flex;justify-content:space-between;gap:8px;align-items:center}
+.profile-actions{display:flex;justify-content:space-between;gap:8px;align-items:center;flex-wrap:wrap;} /* Added flex-wrap */
 .controls-left{display:flex;gap:8px}
 .controls-right{display:flex;gap:8px}
 
@@ -66,7 +70,10 @@ body{
   box-shadow:var(--shadow);display:flex;flex-direction:column;transition:transform var(--transition), box-shadow var(--transition);
   border:1px solid rgba(0,0,0,0.04);cursor:pointer;padding:10px;isolation:isolate;
 }
-.gift:hover{transform:translateY(-10px);box-shadow:0 26px 60px rgba(0,0,0,0.14)}
+/* Only apply hover effect for non-touch devices (desktop) */
+@media (pointer: fine) {
+  .gift:hover{transform:translateY(-10px);box-shadow:0 26px 60px rgba(0,0,0,0.14)}
+}
 .gift:focus{outline:3px solid rgba(239,66,126,0.10);transform:translateY(-6px)}
 
 /* image frame: visible gradient border, image fills box without distortion */
@@ -94,18 +101,28 @@ body{
 .price{color:var(--c1);font-weight:800}
 .store{color:#6b2b3a;font-weight:700}
 
-/* info-overlay revealed on hover or via touch toggle; positioned inside card so nothing is clipped */
-.info-overlay{
-  position:absolute;left:10px;right:10px;bottom:12px;border-radius:10px;background:linear-gradient(180deg,rgba(255,255,255,0.98),#fff);
-  box-shadow:0 8px 24px rgba(0,0,0,0.08);padding:12px;transform:translateY(18px);opacity:0;pointer-events:none;
-  transition:opacity 260ms ease, transform 260ms cubic-bezier(.2,.9,.2,1);
-  z-index:6;
+/* info-overlay revealed on hover; positioned inside card so nothing is clipped */
+/* Only visible on non-touch devices (desktop) for extra info on hover */
+@media (pointer: fine) {
+  .info-overlay{
+    position:absolute;left:10px;right:10px;bottom:12px;border-radius:10px;background:linear-gradient(180deg,rgba(255,255,255,0.98),#fff);
+    box-shadow:0 8px 24px rgba(0,0,0,0.08);padding:12px;transform:translateY(18px);opacity:0;pointer-events:none;
+    transition:opacity 260ms ease, transform 260ms cubic-bezier(.2,.9,.2,1);
+    z-index:6;
+  }
+  .gift:hover .info-overlay,
+  .gift:focus-within .info-overlay{
+    transform:translateY(0);opacity:1;pointer-events:auto;
+  }
 }
-.gift.show-info .info-overlay,
-.gift:hover .info-overlay,
-.gift:focus-within .info-overlay{
-  transform:translateY(0);opacity:1;pointer-events:auto;
+
+/* mobile: overlay is hidden, users rely on modal for details */
+@media (pointer: coarse), (max-width: 520px) {
+    .info-overlay {
+        display: none;
+    }
 }
+
 
 /* overlay content */
 .info-inner{display:flex;flex-direction:column;gap:8px}
@@ -129,7 +146,7 @@ body{
 .modal-body{padding:20px;flex:1;display:flex;flex-direction:column;gap:12px}
 .modal-ratings{display:flex;gap:18px}
 .modal-meta{display:flex;gap:12px;align-items:center}
-.modal-actions{display:flex;gap:10px;margin-top:auto;align-items:center}
+.modal-actions{display:flex;gap:10px;margin-top:auto;align-items:center;flex-wrap:wrap;} /* Added flex-wrap */
 
 /* bought state */
 .gift.bought{opacity:0.6;filter:grayscale(0.18);transform:scale(0.992)}
@@ -139,15 +156,18 @@ body{
 @media (max-width:880px){
   :root{--card-h:320px}
   .grid{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
-  .modal-card{flex-direction:column;max-width:720px}
+  .modal-card{flex-direction:column;max-width:720px;overflow:auto;max-height:95vh;} /* Added overflow:auto and max-height for better scrollability */
   .modal-media{flex:0 0 auto;width:100%}
+  .modal-media img{max-height:40vh;} /* Reduced max-height for image on smaller screens */
 }
 @media (max-width:520px){
   :root{--card-h:300px}
   body{padding:18px 12px}
-  .profile{flex-direction:column;align-items:flex-start}
-  .profile-photo-wrap{width:96px;height:96px}
+  /* Better profile stacking on mobile */
+  .profile{flex-direction:column;align-items:center;text-align:center;}
+  .profile-card{align-items:center;text-align:center;}
+  .subtitle, .bio {text-align: center;}
+  .profile-photo-wrap{width:96px;height:96px;margin-bottom:8px;}
   .grid{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
-  .info-overlay{position:relative;transform:none;opacity:1;pointer-events:auto}
-  .gift:hover .info-overlay{transform:none;opacity:1}
+  .controls-left, .controls-right {justify-content: center; flex-basis: 100%;}
 }
