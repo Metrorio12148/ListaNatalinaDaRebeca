@@ -56,32 +56,35 @@ body{
 .btn.ghost{background:transparent;color:var(--c1);border:2px solid rgba(175,30,89,0.12);box-shadow:none}
 .btn.small{padding:6px 8px;font-size:0.88rem;border-radius:8px}
 
-/* grid */
+/* grid wrapper */
 .grid-wrap{padding:0}
+
+/* Base grid for desktop/tablet */
 .grid{
   display:grid;gap:18px;
+  /* Columns for Tablet/Desktop */
   grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
   align-items:start;
 }
-
-/* card base */
+/* Desktop/Tablet Card: Grid Layout */
 .gift{
   height:var(--card-h);background:var(--card-bg);border-radius:12px;overflow:visible;position:relative;
   box-shadow:var(--shadow);display:flex;flex-direction:column;transition:transform var(--transition), box-shadow var(--transition);
   border:1px solid rgba(0,0,0,0.04);cursor:pointer;padding:10px;isolation:isolate;
 }
-/* Only apply hover effect for non-touch devices (desktop) */
-@media (pointer: fine) {
-  .gift:hover{transform:translateY(-10px);box-shadow:0 26px 60px rgba(0,0,0,0.14)}
-}
-.gift:focus{outline:3px solid rgba(239,66,126,0.10);transform:translateY(-6px)}
-
-/* image frame: visible gradient border, image fills box without distortion */
+/* Desktop/Tablet: Image aspect */
 .img-frame{
   width:100%;height:var(--img-height);display:flex;align-items:center;justify-content:center;
   padding:8px;border-radius:10px;background:linear-gradient(135deg,var(--c2),var(--c5));
   box-shadow:inset 0 -12px 30px rgba(0,0,0,0.04);overflow:hidden;
 }
+
+/* card base */
+/* Only apply hover effect for non-touch devices (desktop) */
+@media (pointer: fine) {
+  .gift:hover{transform:translateY(-10px);box-shadow:0 26px 60px rgba(0,0,0,0.14)}
+}
+.gift:focus{outline:3px solid rgba(239,66,126,0.10);transform:translateY(-6px)}
 
 /* img-box keeps aspect ratio; gift-img uses object-fit:cover so it fills container without distortion */
 .img-box{
@@ -150,6 +153,12 @@ body{
 
 /* bought state */
 .gift.bought{opacity:0.6;filter:grayscale(0.18);transform:scale(0.992)}
+/* Remove transform/scale on mobile list view for a cleaner look */
+@media (max-width: 520px) {
+    .gift.bought{
+        transform: none;
+    }
+}
 .gift.bought .mark-bought{background:linear-gradient(90deg,#ffd76a,#f29f05);color:#4a2f00}
 
 /* responsive */
@@ -160,14 +169,53 @@ body{
   .modal-media{flex:0 0 auto;width:100%}
   .modal-media img{max-height:40vh;} /* Reduced max-height for image on smaller screens */
 }
+/* MOBILE (max-width: 520px) */
 @media (max-width:520px){
-  :root{--card-h:300px}
+  :root{--card-h:auto} /* Allow card height to be auto */
   body{padding:18px 12px}
   /* Better profile stacking on mobile */
   .profile{flex-direction:column;align-items:center;text-align:center;}
   .profile-card{align-items:center;text-align:center;}
   .subtitle, .bio {text-align: center;}
   .profile-photo-wrap{width:96px;height:96px;margin-bottom:8px;}
-  .grid{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+
+  /* Mudar para Layout de Lista */
+  .grid{
+    display:flex; /* Use flexbox for single column list */
+    flex-direction: column;
+    gap: 12px; /* Reduzir o espaçamento entre os itens */
+  }
+
+  /* Card no modo Lista (Imagem e Texto lado a lado) */
+  .gift{
+    height: auto;
+    flex-direction: row; /* Altera para layout de linha */
+    align-items: stretch;
+    padding: 8px; /* Menor padding */
+  }
+
+  /* Frame da imagem no modo Lista */
+  .img-frame{
+    flex: 0 0 100px; /* Tamanho fixo para a imagem (ou 30%) */
+    height: 100px; /* Altura fixa para a imagem */
+    padding: 6px;
+    margin-right: 12px; /* Espaço entre imagem e texto */
+    box-shadow: none; /* Simplificar o design da imagem */
+  }
+  
+  /* Remove a transição/efeito de hover no mobile */
+  .gift:hover{
+    transform: none;
+    box-shadow: var(--shadow);
+  }
+
+  /* Footer do card: agora será o corpo do item da lista */
+  .card-footer{
+    padding-top: 0;
+    flex: 1; /* Ocupa o espaço restante */
+    justify-content: center;
+  }
+  
+  /* Ações do perfil no mobile */
   .controls-left, .controls-right {justify-content: center; flex-basis: 100%;}
 }
