@@ -56,6 +56,7 @@ const createStars = count=>{
   }
   return frag;
 };
+// Detecta dispositivo touch para mudar comportamento info (conforme solicitado)
 const isTouchDevice = ()=> matchMedia('(pointer: coarse)').matches; // Helper to check for touch device
 
 /* render one card */
@@ -90,7 +91,7 @@ function renderCard(g){
   viewLink.addEventListener('click', e=> e.stopPropagation());
   markBtn.addEventListener('click', e=>{ e.stopPropagation(); g.bought = !g.bought; article.classList.toggle('bought', g.bought); });
 
-  // Mobile/Desktop Click/Tap: Always open modal
+  // Mobile/Desktop Click/Tap: Always open modal (conforme solicitado/existente)
   article.addEventListener('click', (e)=>{
     // The previous complex touch logic is removed. Now, any tap/click opens the modal.
     // The hover-based overlay is handled by CSS (desktop only)

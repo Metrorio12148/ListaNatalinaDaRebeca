@@ -179,15 +179,15 @@ body{
   .subtitle, .bio {text-align: center;}
   .profile-photo-wrap{width:96px;height:96px;margin-bottom:8px;}
 
-  /* Mudar para Layout de Lista */
-  .grid{
-    display:flex; /* Use flexbox for single column list */
+  /* Mudar para Layout de Lista (Ajustes solicitados) */
+  .grid {
+    display: flex; /* Mudar grid para layout de lista */
     flex-direction: column;
     gap: 12px; /* Reduzir o espaçamento entre os itens */
   }
 
-  /* Card no modo Lista (Imagem e Texto lado a lado) */
-  .gift{
+  /* Ajustar o card para layout em linha (imagem + texto) */
+  .gift {
     height: auto;
     flex-direction: row; /* Altera para layout de linha */
     align-items: stretch;
